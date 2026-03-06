@@ -1,0 +1,43 @@
+## .NET 8 / Visual Studio / Rider / VS Code gitignore
+## Generado con `dotnet new gitignore`
+
+# Directorios de compilación y salida
+[Bb]in/
+[Oo]bj/
+
+# Carpetas de usuario de Visual Studio
+.vs/
+*.user
+*.userossc
+*.sln.docstates
+
+# Archivos de configuración de usuario de Rider
+.idea/
+
+# Carpetas de VS Code
+.vscode/
+
+# Archivos de entorno y temporales
+*.dbmdl
+*.jfm
+*.log
+*.tmp
+*.publishsettings
+
+# Paquetes NuGet
+*.nupkg
+# (Opcional) Ignorar paquetes restaurados si prefieres restaurarlos cada vez
+# **/packages/*
+# !**/packages/build/
+
+# Archivos de la suite de pruebas
+TestResults/
+*.trx
+
+# Blazor (para .NET 8/Blazor)
+**/.blazor/
+**/wwwroot/_framework/
+
+# Archivos de caché
+*.pyc
+*.user
