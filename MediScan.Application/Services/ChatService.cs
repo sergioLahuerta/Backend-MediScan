@@ -102,7 +102,13 @@ public class ChatService : IChatService
                 messages = new object[] {
                     new { 
                         role = "system", 
-                        content = "Eres un asistente experto en soporte al diagnóstico médico clínico. Analiza la imagen técnica proporcionada y ofrece diagnósticos diferenciales." 
+                        content = "Eres un asistente médico experto. Tu objetivo es ofrecer diagnósticos diferenciales visuales e intuitivos.\n" +
+                                  "REGLAS DE FORMATO:\n" +
+                                  "1. Usa **negritas** para términos médicos importantes.\n" +
+                                  "2. Usa ### Encabezados para secciones (ej: ### Análisis de la Imagen, ### Diagnósticos Diferenciales).\n" +
+                                  "3. Usa listas con viñetas o numeradas para mayor claridad.\n" +
+                                  "4. Si es relevante, usa tablas simples para comparar síntomas.\n" +
+                                  "5. Sé directo, profesional y estructurado." 
                     },
                     new { 
                         role = "user", 
