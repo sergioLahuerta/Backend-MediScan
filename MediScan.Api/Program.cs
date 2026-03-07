@@ -70,9 +70,6 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<MediScanDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
-// register http client factory for AI calls
-builder.Services.AddHttpClient();
-
 // Dependency Injection
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
@@ -121,9 +118,6 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 
 // JWT Authentication Setup
 var jwtKey = builder.Configuration["Jwt:Key"] ?? "super_secret_key_mediscan_min_32_characters_1234!";
-
-// example Groq API key configuration (set a real value in appsettings or environment)
-// builder.Configuration["Groq:ApiKey"]
 var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "MediScanApi";
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

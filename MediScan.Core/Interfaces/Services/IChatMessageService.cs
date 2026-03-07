@@ -11,8 +11,5 @@ public interface IChatMessageService
     Task<ChatMessage> AddAsync(ChatMessage entity);
     Task UpdateAsync(ChatMessage entity);
     Task DeleteAsync(ChatMessage entity);
-
-    // new method to process a conversation with the AI and persist both user and AI messages
-    Task<string> ProcessChatAsync(Guid sessionId, string userMessage, string? base64Image = null);
 }
 
