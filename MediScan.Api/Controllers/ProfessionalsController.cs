@@ -17,6 +17,7 @@ public class ProfessionalsController : ControllerBase
         _Service = Service;
     }
 
+    [Microsoft.AspNetCore.Authorization.AllowAnonymous]
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
