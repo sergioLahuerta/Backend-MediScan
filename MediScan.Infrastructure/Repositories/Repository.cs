@@ -40,7 +40,7 @@ public class Repository<T> : IRepository<T> where T : class
         await _context.SaveChangesAsync();
     }
 
-    public async Task DeleteAsync(object id)
+    public virtual async Task DeleteAsync(object id)
     {
         var entity = await GetByIdAsync(id);
         if (entity != null)
