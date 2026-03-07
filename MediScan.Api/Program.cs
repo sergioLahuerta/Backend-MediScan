@@ -22,15 +22,11 @@ builder.Services.AddEndpointsApiExplorer();
 // CORS: allow Vue dev server to call the API
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("VueFrontend", policy =>
+    options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins(
-                "http://localhost:5173",
-                "http://localhost:4173"  // vite preview
-            )
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials();
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
     });
 });
 
@@ -117,6 +113,9 @@ builder.Services.AddScoped<IDetailInvoiceService, DetailInvoiceService>();
 builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
+builder.Services.AddMemoryCache();
+builder.Services.AddHttpClient();
+
 // JWT Authentication Setup
 var jwtKey = builder.Configuration["Jwt:Key"] ?? "super_secret_key_mediscan_min_32_characters_1234!";
 var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "MediScanApi";
@@ -144,10 +143,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
 // CORS must run before auth
-app.UseCors("VueFrontend");
+app.UseCors();
 
 // IMPORTANT: Authentication must be added before Authorization
 app.UseAuthentication();

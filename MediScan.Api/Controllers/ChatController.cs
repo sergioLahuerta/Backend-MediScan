@@ -4,31 +4,54 @@ using System.Threading.Tasks;
 using System.IO;
 using System;
 using MediScan.Core.Interfaces.Services;
+using MediScan.Core.Interfaces.Repositories;
+using MediScan.Core.Entities;
+using MediScan.Core.Enums;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace MediScan.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Microsoft.AspNetCore.Authorization.AllowAnonymous]
 public class ChatController : ControllerBase
 {
     private readonly IChatService _chatService;
+    private readonly IChatSessionRepository _chatSessionRepository;
     private readonly IMemoryCache _cache;
     private const int GuestDailyLimit = 3;
 
-    public ChatController(IChatService chatService, IMemoryCache cache)
+    public ChatController(IChatService chatService, IChatSessionRepository chatSessionRepository, IMemoryCache cache)
     {
         _chatService = chatService;
+        _chatSessionRepository = chatSessionRepository;
         _cache = cache; // Para seguir manteniendo el requerimiento de "solo 3 sin login" del usuario
     }
 
-    // 1. Crear una nueva sesión de chat
     [HttpPost("session")]
-    public IActionResult StartSession()
+    public async Task<IActionResult> StartSession()
     {
         // En temp tomaban {userId} asume login, pero aquí pidieron "funciona sin login" 
-        // Generamos un Guid aleatorio y lo devolvemos tal cual.
-        return Ok(new { sessionId = Guid.NewGuid().ToString() });
+        // Generamos un Guid aleatorio y lo devolvemos para que el chat funcione.
+        var sessionId = Guid.NewGuid();
+        
+        try 
+        {
+            // Intentamos persistir en DB si está disponible
+            await _chatSessionRepository.AddAsync(new ChatSession
+            {
+                Id = sessionId,
+                SessionType = SessionType.Diagnosis,
+                StartedAt = DateTime.UtcNow
+            });
+        }
+        catch (Exception ex)
+        {
+            // Si la DB falla (ej: MySQL apagado), logueamos pero permitimos que el chat siga en memoria
+            Console.WriteLine($"[DATABASE ERROR - Session]: {ex.Message}");
+        }
+
+        return Ok(new { sessionId = sessionId.ToString() });
     }
 
     // 2. Enviar un mensaje y recibir respuesta de la IA

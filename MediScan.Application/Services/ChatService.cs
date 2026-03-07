@@ -6,29 +6,75 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using MediScan.Core.Interfaces.Services;
+using MediScan.Core.Interfaces.Repositories;
+using MediScan.Core.Entities;
+using MediScan.Core.Enums;
 
 namespace MediScan.Application.Services;
 
 public class ChatService : IChatService
 {
+    private readonly IChatMessageRepository _chatMessageRepository;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly string _groqApiKey;
 
-    public ChatService(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+    public ChatService(IChatMessageRepository chatMessageRepository, IHttpClientFactory httpClientFactory, IConfiguration configuration)
     {
+        _chatMessageRepository = chatMessageRepository;
         _httpClientFactory = httpClientFactory;
         
         // Sacamos la key de appsettings.json, si no está cogemos la harcodeada del temp (de fallback)
         _groqApiKey = configuration["Groq:ApiKey"] 
-                     ?? "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";
+                     ?? "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";
     }
 
     public async Task<string> ProcessChatAsync(string sessionId, string userMessage, string? base64Image)
     {
-        // En temp, esto llamaba a _repository.AddMessageAsync(...) para la request y response.
-        // Dado el 500 error anterior, no usamos DB SQL directamente aquí para evitar bloqueos si no está configurada,
-        // igual que vimos, nos centraremos en devolver el AI response correctamente.
-        return await GetAIResponse(userMessage, base64Image);
+        var sessionGuid = Guid.Empty;
+        Guid.TryParse(sessionId, out sessionGuid);
+
+        try
+        {
+            // Intentamos guardar el mensaje del usuario en SQL
+            if (sessionGuid != Guid.Empty)
+            {
+                await _chatMessageRepository.AddAsync(new ChatMessage
+                {
+                    ChatSessionId = sessionGuid,
+                    SenderType = SenderType.User,
+                    MessageText = userMessage,
+                    SentAt = DateTime.UtcNow
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[DB ERROR - User Message]: {ex.Message}");
+        }
+
+        // Obtenemos la respuesta de la IA (Pasando la imagen si existe)
+        string aiResponse = await GetAIResponse(userMessage, base64Image);
+
+        try
+        {
+            // Intentamos guardar la respuesta de la IA en SQL
+            if (sessionGuid != Guid.Empty)
+            {
+                await _chatMessageRepository.AddAsync(new ChatMessage
+                {
+                    ChatSessionId = sessionGuid,
+                    SenderType = SenderType.AI,
+                    MessageText = aiResponse,
+                    SentAt = DateTime.UtcNow
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[DB ERROR - AI Response]: {ex.Message}");
+        }
+
+        return aiResponse;
     }
 
     private async Task<string> GetAIResponse(string prompt, string? base64Image = null)
@@ -49,7 +95,7 @@ public class ChatService : IChatService
                 });
             }
 
-            // 2. Construimos la lista de mensajes con el modelo LLAMA 4 SCOUT (Igual que en temp)
+            // 2. Construimos la lista de mensajes con el modelo LLAMA 4 SCOUT
             var requestBody = new
             {
                 model = "meta-llama/llama-4-scout-17b-16e-instruct",
