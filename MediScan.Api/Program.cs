@@ -114,6 +114,7 @@ builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
 builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 builder.Services.AddScoped<IDetailInvoiceRepository, DetailInvoiceRepository>();
 builder.Services.AddScoped<IDetailInvoiceService, DetailInvoiceService>();
+builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
 // JWT Authentication Setup
