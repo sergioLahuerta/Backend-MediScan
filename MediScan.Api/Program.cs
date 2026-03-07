@@ -17,6 +17,22 @@ builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
 });
 builder.Services.AddEndpointsApiExplorer();
+
+// CORS: allow Vue dev server to call the API
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("VueFrontend", policy =>
+    {
+        policy.WithOrigins(
+                "http://localhost:5173",
+                "http://localhost:4173"  // vite preview
+            )
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "MediScan API", Version = "v1" });
@@ -127,6 +143,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// CORS must run before auth
+app.UseCors("VueFrontend");
 
 // IMPORTANT: Authentication must be added before Authorization
 app.UseAuthentication();
