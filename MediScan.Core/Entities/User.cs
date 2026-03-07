@@ -12,6 +12,7 @@ public class User
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     public bool IsActive { get; set; } = true;
+    public string? ProfileImageUrl { get; set; }
 
     // Navigation properties
     public Role? Role { get; set; }

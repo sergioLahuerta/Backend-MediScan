@@ -56,6 +56,7 @@ public class MediScanDbContext : DbContext
         // Relationships configurations to prevent cascading loops
         modelBuilder.Entity<Appointment>().HasOne(a => a.Patient).WithMany(p => p.Appointments).HasForeignKey(a => a.PatientId).OnDelete(DeleteBehavior.Restrict);
         modelBuilder.Entity<Appointment>().HasOne(a => a.Professional).WithMany(p => p.Appointments).HasForeignKey(a => a.ProfessionalId).OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<Diagnosis>().ToTable("Diagnosis");
         modelBuilder.Entity<Diagnosis>().HasOne(d => d.Patient).WithMany(p => p.Diagnoses).HasForeignKey(d => d.PatientId).OnDelete(DeleteBehavior.Restrict);
         modelBuilder.Entity<Diagnosis>().HasOne(d => d.Professional).WithMany(p => p.Diagnoses).HasForeignKey(d => d.ProfessionalId).OnDelete(DeleteBehavior.Restrict);
         modelBuilder.Entity<Review>().HasOne(r => r.Patient).WithMany(p => p.Reviews).HasForeignKey(r => r.PatientId).OnDelete(DeleteBehavior.Restrict);

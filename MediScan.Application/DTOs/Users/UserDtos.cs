@@ -9,6 +9,7 @@ public class UserDto
     public int? RoleId { get; set; }
     public bool IsActive { get; set; }
     public DateTime CreatedAt { get; set; }
+    public string? ProfileImageUrl { get; set; }
 }
 
 public class UserLoginDto

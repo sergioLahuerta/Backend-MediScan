@@ -143,6 +143,30 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// Ensure database schema is up to date
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<MediScanDbContext>();
+        // Add ProfileImageUrl if it doesn't exist
+        var sql = "ALTER TABLE Users ADD COLUMN IF NOT EXISTS ProfileImageUrl VARCHAR(500) NULL;";
+        // MariaDB/MySQL doesn't support 'ADD COLUMN IF NOT EXISTS' in all versions easily, 
+        // so we use a more compatible check or just ignore the error.
+        try {
+            await context.Database.ExecuteSqlRawAsync("ALTER TABLE Users ADD COLUMN ProfileImageUrl VARCHAR(500) NULL;");
+        } catch { /* Column might already exist */ }
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while updating the database schema.");
+    }
+}
+
+app.UseStaticFiles();
+
 // app.UseHttpsRedirection();
 
 // CORS must run before auth
