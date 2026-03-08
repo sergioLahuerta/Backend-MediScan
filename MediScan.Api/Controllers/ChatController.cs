@@ -175,4 +175,18 @@ public class ChatController : ControllerBase
 
         return Ok(new { userMessage = finalMessage, aiResponse = response });
     }
+
+    [HttpPost("{sessionId}/report")]
+    public async Task<IActionResult> GenerateReport(string sessionId)
+    {
+        try
+        {
+            var report = await _chatService.GenerateClinicalReportAsync(sessionId);
+            return Ok(new { report });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { error = "Internal Server Error", message = ex.Message });
+        }
+    }
 }

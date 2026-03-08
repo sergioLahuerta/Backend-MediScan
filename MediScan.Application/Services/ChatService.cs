@@ -73,6 +73,34 @@ public class ChatService : IChatService
         return aiResponse;
     }
 
+    public async Task<string> GenerateClinicalReportAsync(string sessionId)
+    {
+        if (!Guid.TryParse(sessionId, out var sessionGuid))
+            return "ID de sesión inválido.";
+
+        var messages = await _chatMessageRepository.GetMessagesBySessionIdAsync(sessionGuid);
+        if (messages == null || !messages.Any())
+            return "No hay suficientes datos en la conversación para generar un informe.";
+
+        // Construir el historial para la IA
+        var historyBuilder = new StringBuilder();
+        foreach (var msg in messages.OrderBy(m => m.SentAt))
+        {
+            historyBuilder.AppendLine($"{(msg.SenderType == SenderType.User ? "Paciente" : "IA")}: {msg.MessageText}");
+        }
+
+        string prompt = "Basado en la siguiente conversación médica, genera un informe clínico estructurado y profesional.\n" +
+                        "EL INFORME DEBE TENER ESTAS SECCIONES:\n" +
+                        "### 1. Resumen de Sintomatología\n" +
+                        "### 2. Diagnóstico Diferencial Estimado\n" +
+                        "### 3. Plan de Acción y Tratamiento Sugerido\n" +
+                        "### 4. Recomendaciones Adicionales y Signos de Alerta\n\n" +
+                        "CONVERSACIÓN:\n" +
+                        historyBuilder.ToString();
+
+        return await GetAIResponse(prompt);
+    }
+
     private async Task<string> GetAIResponse(string prompt, string? base64Image = null)
     {
         try
@@ -99,10 +127,9 @@ public class ChatService : IChatService
                         content = "Eres un asistente médico experto. Tu objetivo es ofrecer diagnósticos diferenciales visuales e intuitivos.\n" +
                                   "REGLAS DE FORMATO:\n" +
                                   "1. Usa **negritas** para términos médicos importantes.\n" +
-                                  "2. Usa ### Encabezados para secciones (ej: ### Análisis de la Imagen, ### Diagnósticos Diferenciales).\n" +
+                                  "2. Usa ### Encabezados para secciones.\n" +
                                   "3. Usa listas con viñetas o numeradas para mayor claridad.\n" +
-                                  "4. Si es relevante, usa tablas simples para comparar síntomas.\n" +
-                                  "5. Sé directo, profesional y estructurado." 
+                                  "4. Sé directo, profesional y estructurado." 
                     },
                     new { 
                         role = "user", 
@@ -130,7 +157,7 @@ public class ChatService : IChatService
         }
         catch (Exception ex)
         {
-            return $"Error con Llama 4: {ex.Message}";
+            return $"Error con Groq: {ex.Message}";
         }
     }
 }
