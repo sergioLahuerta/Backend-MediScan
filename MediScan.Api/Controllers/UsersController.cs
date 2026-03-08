@@ -12,10 +12,12 @@ namespace MediScan.Api.Controllers;
 public class UsersController : ControllerBase
 {
     private readonly IUserRepository _repository;
+    private readonly IWebHostEnvironment _environment;
 
-    public UsersController(IUserRepository repository)
+    public UsersController(IUserRepository repository, IWebHostEnvironment environment)
     {
         _repository = repository;
+        _environment = environment;
     }
 
     [HttpGet]
@@ -66,7 +68,7 @@ public class UsersController : ControllerBase
         var user = await _repository.GetByIdAsync(userId);
         if (user == null) return NotFound();
 
-        var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "profiles");
+        var uploadPath = Path.Combine(_environment.WebRootPath, "uploads", "profiles");
         if (!Directory.Exists(uploadPath))
             Directory.CreateDirectory(uploadPath);
 
