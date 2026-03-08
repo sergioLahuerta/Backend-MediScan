@@ -1,8 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using MediScan.Core.Interfaces.Repositories;
 using MediScan.Infrastructure.Data;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace MediScan.Infrastructure.Repositories;
 

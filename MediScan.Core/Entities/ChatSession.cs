@@ -1,4 +1,3 @@
-using System;
 using MediScan.Core.Enums;
 
 namespace MediScan.Core.Entities;
@@ -12,7 +11,7 @@ public class ChatSession
     public DateTime? EndedAt { get; set; }
     public string? Title { get; set; }
 
-    // Navigation properties
+    
     public User? User { get; set; }
     public ICollection<ChatMessage> Messages { get; set; } = new List<ChatMessage>();
 }

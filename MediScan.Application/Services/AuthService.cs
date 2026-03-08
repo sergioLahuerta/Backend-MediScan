@@ -1,15 +1,11 @@
-using System;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using MediScan.Application.DTOs.Users;
 using MediScan.Core.Interfaces.Repositories;
 using MediScan.Core.Entities;
-using BCrypt.Net;
 
 namespace MediScan.Application.Services;
 

@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using MediScan.Core.Interfaces.Services;
 using MediScan.Core.Interfaces.Repositories;
@@ -23,7 +19,7 @@ public class ChatService : IChatService
         _chatMessageRepository = chatMessageRepository;
         _httpClientFactory = httpClientFactory;
         
-        // Sacamos la key de appsettings.json, si no está cogemos la harcodeada del temp (de fallback)
+        // Api Key de appsettings.json
         _groqApiKey = configuration["Groq:ApiKey"] 
                      ?? "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";
     }
@@ -35,7 +31,7 @@ public class ChatService : IChatService
 
         try
         {
-            // Intentamos guardar el mensaje del usuario en SQL
+            // Guardado del mensaje del usuario en SQL
             if (sessionGuid != Guid.Empty)
             {
                 await _chatMessageRepository.AddAsync(new ChatMessage
@@ -52,12 +48,12 @@ public class ChatService : IChatService
             Console.WriteLine($"[DB ERROR - User Message]: {ex.Message}");
         }
 
-        // Obtenemos la respuesta de la IA (Pasando la imagen si existe)
+        // Respuesta de la IA (pasando la imagen si existe)
         string aiResponse = await GetAIResponse(userMessage, base64Image);
 
         try
         {
-            // Intentamos guardar la respuesta de la IA en SQL
+            // Guardado de la respuesta de la IA en SQL
             if (sessionGuid != Guid.Empty)
             {
                 await _chatMessageRepository.AddAsync(new ChatMessage
@@ -84,7 +80,6 @@ public class ChatService : IChatService
             var client = _httpClientFactory.CreateClient();
             var url = "https://api.groq.com/openai/v1/chat/completions";
 
-            // 1. Preparamos el contenido del usuario (Texto + Imagen)
             var userContent = new List<object> { new { type = "text", text = prompt } };
 
             if (!string.IsNullOrEmpty(base64Image))
@@ -95,7 +90,6 @@ public class ChatService : IChatService
                 });
             }
 
-            // 2. Construimos la lista de mensajes con el modelo LLAMA 4 SCOUT
             var requestBody = new
             {
                 model = "meta-llama/llama-4-scout-17b-16e-instruct",
@@ -126,7 +120,6 @@ public class ChatService : IChatService
 
             using var doc = JsonDocument.Parse(responseString);
             
-            // Atrapamos errores de la API como cuota excedida
             if (doc.RootElement.TryGetProperty("error", out var errorProp))
             {
                 var msg = errorProp.TryGetProperty("message", out var m) ? m.GetString() : responseString;

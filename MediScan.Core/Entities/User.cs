@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace MediScan.Core.Entities;
 
 public class User
@@ -14,7 +11,7 @@ public class User
     public bool IsActive { get; set; } = true;
     public string? ProfileImageUrl { get; set; }
 
-    // Navigation properties
+    
     public Role? Role { get; set; }
     public Patient? Patient { get; set; }
     public Professional? Professional { get; set; }

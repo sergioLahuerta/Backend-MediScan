@@ -1,4 +1,3 @@
-using System;
 using MediScan.Core.Enums;
 
 namespace MediScan.Core.Entities;
@@ -13,7 +12,6 @@ public class Appointment
     public AppointmentStatus Status { get; set; } = AppointmentStatus.Scheduled;
     public string? Notes { get; set; }
 
-    // Navigation properties
     public Patient Patient { get; set; } = null!;
     public Professional Professional { get; set; } = null!;
 }

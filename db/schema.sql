@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS Roles (
 
 -- Usuarios principales (Guids para integración con entidades externas)
 CREATE TABLE IF NOT EXISTS Users (
-    Id CHAR(36) PRIMARY KEY, -- Usaremos GUIDs como solicitaste
+    Id CHAR(36) PRIMARY KEY, -- Con GUIDs
     Email VARCHAR(255) UNIQUE NOT NULL,
     PasswordHash VARCHAR(255),
     RoleId INT,
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS Users (
 -- Contadores de uso para limitar la IA en la versión Free
 CREATE TABLE IF NOT EXISTS UsageCounters (
     Id INT AUTO_INCREMENT PRIMARY KEY,
-    UserId CHAR(36), -- NULL si es usuario invitado
+    UserId CHAR(36), -- Puede srw NULL si es usuario invitado
     ClientIdentifier VARCHAR(255), -- IP o Token de cookie para trackear invitados
     TokensUsed INT DEFAULT 0,
     MessagesSent INT DEFAULT 0,
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS UsageCounters (
     FOREIGN KEY (UserId) REFERENCES Users(Id)
 );
 
--- Extendemos el usuario para los Pacientes
+-- Pacientes
 CREATE TABLE IF NOT EXISTS Patients (
     UserId CHAR(36) PRIMARY KEY,
     FirstName VARCHAR(100) NOT NULL,
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS Patients (
     FOREIGN KEY (UserId) REFERENCES Users(Id)
 );
 
--- Extendemos el usuario para los Profesionales Médicos
+-- Profesionales Médicos
 CREATE TABLE IF NOT EXISTS Professionals (
     UserId CHAR(36) PRIMARY KEY,
     FirstName VARCHAR(100) NOT NULL,
@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS Organizations (
     ContactEmail VARCHAR(255)
 );
 
--- Relación N:M entre Paciente y Médico (Si tienen historial juntos)
+-- Historial entre Paciente y Médico
 CREATE TABLE IF NOT EXISTS DoctorPatient (
     PatientId CHAR(36),
     ProfessionalId CHAR(36),
@@ -113,8 +113,8 @@ CREATE TABLE IF NOT EXISTS Appointments (
 
 -- Sesiones de Chat con la IA
 CREATE TABLE IF NOT EXISTS ChatSessions (
-    Id CHAR(36) PRIMARY KEY, -- GUID para URL única (Token temporal para invitados)
-    UserId CHAR(36), -- Permitimos NULL para usuarios anónimos/invitados
+    Id CHAR(36) PRIMARY KEY, -- GUID para URL única
+    UserId CHAR(36), -- Puede ser NULL para usuarios anónimos/invitados
     SessionType VARCHAR(50) DEFAULT 'Diagnosis', -- 'Diagnosis' o 'ProfessionalConsultation'
     StartedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     EndedAt DATETIME, -- Registra cuándo el usuario cerró el chat o expiró por inactividad
@@ -142,19 +142,19 @@ CREATE TABLE IF NOT EXISTS MessageAttachments (
     FOREIGN KEY (ChatMessageId) REFERENCES ChatMessages(Id)
 );
 
--- Historial médico: Diagnósticos
+-- Diagnosticos
 CREATE TABLE IF NOT EXISTS Diagnosis (
     Id INT AUTO_INCREMENT PRIMARY KEY,
     PatientId CHAR(36) NOT NULL,
     ProfessionalId CHAR(36) NOT NULL,
     DiagnosisDate DATETIME DEFAULT CURRENT_TIMESTAMP,
     Description TEXT NOT NULL,
-    ICD10Code VARCHAR(20), -- Código internacional de enfermedades (opcional)
+    ICD10Code VARCHAR(20), -- Puede ser NULL el código internacional de enfermedades
     FOREIGN KEY (PatientId) REFERENCES Patients(UserId),
     FOREIGN KEY (ProfessionalId) REFERENCES Professionals(UserId)
 );
 
--- Historial médico: Tratamientos adheridos a diagnósticos
+-- Tratamientos adjuntos a los diagnosticos
 CREATE TABLE IF NOT EXISTS Treatments (
     Id INT AUTO_INCREMENT PRIMARY KEY,
     DiagnosisId INT NOT NULL,

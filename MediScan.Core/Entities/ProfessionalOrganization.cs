@@ -1,5 +1,3 @@
-using System;
-
 namespace MediScan.Core.Entities;
 
 public class ProfessionalOrganization

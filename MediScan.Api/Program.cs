@@ -11,7 +11,7 @@ using MediScan.Application.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Añadir servicioss
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
@@ -19,7 +19,7 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 });
 builder.Services.AddEndpointsApiExplorer();
 
-// CORS: allow Vue dev server to call the API
+// Permitir CORS
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
@@ -34,7 +34,6 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "MediScan API", Version = "v1" });
 
-    // Enable Authorization button in Swagger UI
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -61,12 +60,12 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// Configure Entity Framework Core with MySQL
+// Confighuración Entity Framework Core con MySQL
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "Server=localhost;Database=MediScanDB;User=root;Password=;";
 builder.Services.AddDbContext<MediScanDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
-// Dependency Injection
+// Inyección de dependencias
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IRoleService, RoleService>();
@@ -116,7 +115,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddMemoryCache();
 builder.Services.AddHttpClient();
 
-// JWT Authentication Setup
+// Autenticación del JWT
 var jwtKey = builder.Configuration["Jwt:Key"] ?? "super_secret_key_mediscan_min_32_characters_1234!";
 var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "MediScanApi";
 
@@ -143,36 +142,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// Ensure database schema is up to date
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    try
-    {
-        var context = services.GetRequiredService<MediScanDbContext>();
-        // Add ProfileImageUrl if it doesn't exist
-        var sql = "ALTER TABLE Users ADD COLUMN IF NOT EXISTS ProfileImageUrl VARCHAR(500) NULL;";
-        // MariaDB/MySQL doesn't support 'ADD COLUMN IF NOT EXISTS' in all versions easily, 
-        // so we use a more compatible check or just ignore the error.
-        try {
-            await context.Database.ExecuteSqlRawAsync("ALTER TABLE Users ADD COLUMN ProfileImageUrl VARCHAR(500) NULL;");
-        } catch { /* Column might already exist */ }
-    }
-    catch (Exception ex)
-    {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while updating the database schema.");
-    }
-}
-
 app.UseStaticFiles();
 
 // app.UseHttpsRedirection();
 
-// CORS must run before auth
 app.UseCors();
 
-// IMPORTANT: Authentication must be added before Authorization
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

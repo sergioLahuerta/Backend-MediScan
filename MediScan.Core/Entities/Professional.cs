@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace MediScan.Core.Entities;
 
 public class Professional
@@ -13,7 +10,7 @@ public class Professional
     public string? Phone { get; set; }
     public string? Bio { get; set; }
 
-    // Navigation properties
+    
     public User User { get; set; } = null!;
     public ICollection<DoctorPatient> DoctorPatients { get; set; } = new List<DoctorPatient>();
     public ICollection<ProfessionalOrganization> ProfessionalOrganizations { get; set; } = new List<ProfessionalOrganization>();

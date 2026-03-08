@@ -1,6 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Threading.Tasks;
 using MediScan.Core.Interfaces.Services;
 
 namespace MediScan.Api.Controllers;

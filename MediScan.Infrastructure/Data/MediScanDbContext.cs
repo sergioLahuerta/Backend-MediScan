@@ -36,7 +36,7 @@ public class MediScanDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // Composite Keys
+        // Keys
         modelBuilder.Entity<DoctorPatient>()
             .HasKey(dp => new { dp.PatientId, dp.ProfessionalId });
 
@@ -44,7 +44,7 @@ public class MediScanDbContext : DbContext
             .ToTable("Professional_Org")
             .HasKey(po => new { po.ProfessionalId, po.OrganizationId });
 
-        // Primary Keys for User relative entities
+        // PKs
         modelBuilder.Entity<Patient>().HasKey(p => p.UserId);
         modelBuilder.Entity<Patient>().HasOne(p => p.User).WithOne(u => u.Patient).HasForeignKey<Patient>(p => p.UserId);
 
@@ -53,7 +53,7 @@ public class MediScanDbContext : DbContext
 
         modelBuilder.Entity<ProfessionalSchedule>().ToTable("Professional_Schedules");
 
-        // Relationships configurations to prevent cascading loops
+        // Configutación de relaciones para evitar bucles
         modelBuilder.Entity<Appointment>().HasOne(a => a.Patient).WithMany(p => p.Appointments).HasForeignKey(a => a.PatientId).OnDelete(DeleteBehavior.Restrict);
         modelBuilder.Entity<Appointment>().HasOne(a => a.Professional).WithMany(p => p.Appointments).HasForeignKey(a => a.ProfessionalId).OnDelete(DeleteBehavior.Restrict);
         modelBuilder.Entity<Diagnosis>().ToTable("Diagnosis");
@@ -62,7 +62,7 @@ public class MediScanDbContext : DbContext
         modelBuilder.Entity<Review>().HasOne(r => r.Patient).WithMany(p => p.Reviews).HasForeignKey(r => r.PatientId).OnDelete(DeleteBehavior.Restrict);
         modelBuilder.Entity<Review>().HasOne(r => r.Professional).WithMany(p => p.Reviews).HasForeignKey(r => r.ProfessionalId).OnDelete(DeleteBehavior.Restrict);
 
-        // Enum conversions
+        // Conversión de enums
         modelBuilder.Entity<Appointment>().Property(e => e.Status).HasConversion<string>();
         modelBuilder.Entity<ChatSession>().Property(e => e.SessionType).HasConversion<string>();
         modelBuilder.Entity<ChatMessage>().Property(e => e.SenderType).HasConversion<string>();

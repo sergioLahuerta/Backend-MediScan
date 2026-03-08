@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace MediScan.Core.Entities;
 
 public class Patient
@@ -12,7 +9,7 @@ public class Patient
     public string? Gender { get; set; }
     public string? Phone { get; set; }
 
-    // Navigation properties
+    
     public User User { get; set; } = null!;
     public ICollection<DoctorPatient> DoctorPatients { get; set; } = new List<DoctorPatient>();
     public ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();

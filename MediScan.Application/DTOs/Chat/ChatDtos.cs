@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using MediScan.Core.Enums;
 
 namespace MediScan.Application.DTOs.Chat;

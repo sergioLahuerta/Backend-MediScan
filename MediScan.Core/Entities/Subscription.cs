@@ -1,4 +1,3 @@
-using System;
 using MediScan.Core.Enums;
 
 namespace MediScan.Core.Entities;

@@ -1,6 +1,3 @@
-using System;
-using System.Threading.Tasks;
-
 namespace MediScan.Core.Interfaces.Services;
 
 public interface IChatService

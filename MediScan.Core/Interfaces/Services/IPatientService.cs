@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using MediScan.Core.Entities;
 
 namespace MediScan.Core.Interfaces.Services;

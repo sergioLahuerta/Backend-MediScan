@@ -66,12 +66,10 @@ public class UsersController : ControllerBase
         var user = await _repository.GetByIdAsync(userId);
         if (user == null) return NotFound();
 
-        // Create directory if not exists
         var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "profiles");
         if (!Directory.Exists(uploadPath))
             Directory.CreateDirectory(uploadPath);
 
-        // Save file
         var fileName = $"{userId}{Path.GetExtension(file.FileName)}";
         var filePath = Path.Combine(uploadPath, fileName);
 
@@ -80,7 +78,6 @@ public class UsersController : ControllerBase
             await file.CopyToAsync(stream);
         }
 
-        // Update database
         var relativeUrl = $"/uploads/profiles/{fileName}";
         user.ProfileImageUrl = relativeUrl;
         await _repository.UpdateAsync(user);

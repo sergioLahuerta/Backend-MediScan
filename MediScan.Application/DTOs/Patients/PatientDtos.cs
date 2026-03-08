@@ -1,5 +1,3 @@
-using System;
-
 namespace MediScan.Application.DTOs.Patients;
 
 public class PatientDto

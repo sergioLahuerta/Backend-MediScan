@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using MediScan.Core.Interfaces.Repositories;
-using MediScan.Core.Entities;
 using MediScan.Application.DTOs.Patients;
 using Microsoft.AspNetCore.Authorization;
 

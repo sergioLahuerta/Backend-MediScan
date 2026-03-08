@@ -1,5 +1,3 @@
-using System;
-
 namespace MediScan.Application.DTOs.Professionals;
 
 public class ProfessionalDto

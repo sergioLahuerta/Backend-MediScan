@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
-using System.Threading.Tasks;
 using System.IO;
 using System;
 using MediScan.Core.Interfaces.Services;
@@ -20,14 +19,14 @@ public class ChatController : ControllerBase
     private readonly IChatSessionRepository _chatSessionRepository;
     private readonly IChatMessageRepository _chatMessageRepository;
     private readonly IMemoryCache _cache;
-    private const int GuestDailyLimit = 3;
+    private const int GuestDailyLimit = 3; // 3 mensajes máximo por usuario invitado (no logeado)
 
     public ChatController(IChatService chatService, IChatSessionRepository chatSessionRepository, IChatMessageRepository chatMessageRepository, IMemoryCache cache)
     {
         _chatService = chatService;
         _chatSessionRepository = chatSessionRepository;
         _chatMessageRepository = chatMessageRepository;
-        _cache = cache; // Para seguir manteniendo el requerimiento de "solo 3 sin login" del usuario
+        _cache = cache;
     }
 
     [HttpPost("session")]
@@ -130,11 +129,11 @@ public class ChatController : ControllerBase
         }
     }
 
-    // 2. Enviar un mensaje y recibir respuesta de la IA
+    // Enviar mensaje y recibir respuesta de la IA
     [HttpPost("{sessionId}/send")]
     public async Task<IActionResult> SendMessage(string sessionId, [FromForm] string? message, IFormFile? file)
     {
-        // ── Límite de 3 para usuarios no logueados ───────────────────────
+        // Límite de 3 para usuarios no logeados
         bool isAuthenticated = User.Identity?.IsAuthenticated ?? false;
         if (!isAuthenticated)
         {
@@ -158,9 +157,8 @@ public class ChatController : ControllerBase
 
             _cache.Set(cacheKey, count + 1, DateTime.UtcNow.Date.AddDays(1));
         }
-        // ──────────────────────────────────────────────────────────────────
 
-        // Extraer la imagen base64 igual que en temp
+        // Extraer la imagen base64
         string? base64Image = null;
 
         if (file != null && file.Length > 0)
@@ -170,10 +168,9 @@ public class ChatController : ControllerBase
             base64Image = Convert.ToBase64String(ms.ToArray());
         }
 
-        // Usamos un texto por defecto si el mensaje está vacío
+        // Texto por defecto si solo se envia la imagne
         string finalMessage = string.IsNullOrWhiteSpace(message) ? "Analiza el contenido de esta imagen clínica." : message;
 
-        // PASAMOS LOS 3 ARGUMENTOS (Importante: revisa que tu Service los reciba), esto es igual que en temp
         var response = await _chatService.ProcessChatAsync(sessionId, finalMessage, base64Image);
 
         return Ok(new { userMessage = finalMessage, aiResponse = response });
