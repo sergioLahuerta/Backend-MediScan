@@ -94,4 +94,16 @@ public class AuthService : IAuthService
         var token = tokenHandler.CreateToken(tokenDescriptor);
         return tokenHandler.WriteToken(token);
     }
+
+    public void ForgotPassword(ForgotPasswordDto forgotPasswordDto)
+    {
+        var users = _repository.GetAllAsync().GetAwaiter().GetResult();
+        var user = users.FirstOrDefault(u => u.Email == forgotPasswordDto.Email);
+
+        if (user == null)
+            throw new Exception("User not found");
+
+        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(forgotPasswordDto.NewPassword);
+        _repository.UpdateAsync(user).GetAwaiter().GetResult();
+    }
 }

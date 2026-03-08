@@ -45,4 +45,19 @@ public class AuthController : ControllerBase
             return BadRequest(new { Message = ex.Message });
         }
     }
+
+    [HttpPost("ForgotPassword")]
+    [AllowAnonymous]
+    public IActionResult ForgotPassword([FromBody] ForgotPasswordDto forgotPasswordDto)
+    {
+        try
+        {
+            _authService.ForgotPassword(forgotPasswordDto);
+            return Ok(new { Message = "Password updated successfully" });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { Message = ex.Message });
+        }
+    }
 }
