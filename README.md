@@ -37,14 +37,9 @@ git clone https://github.com/sergioLahuerta/Backend-MediScan.git
 git clone https://github.com/sergioLahuerta/Frontend-MediScan.git  
 
 # Tras clonar los dos repositorios, en la raíz del repositorio del Backend-MediScan sacar el docker-compose.yaml para alojarlo al mismo nivel que sendos repositorios.  
-De esta forma:  
- ______________________     
-| > Backend-Mediscan/  |    
-| > Frontend-Mediscan/ |  
-| docker-compose.yaml  |  
-|______________________|  
+De esta forma:   
 
-<img width="170" height="75" alt="image" src="https://github.com/user-attachments/assets/d144b40d-7989-4061-a061-4b9b0a60b991" />
+<img width="270" height="175" alt="image" src="https://github.com/user-attachments/assets/d144b40d-7989-4061-a061-4b9b0a60b991" />
 
 
 # Con esa disposición, en una terminal en la ruta del docker-compose.yaml y los repositorios ->  
