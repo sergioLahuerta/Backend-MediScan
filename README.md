@@ -31,26 +31,26 @@ MediScan Backend es la API RESTful desarrollada en .NET 8 con C# que soporta la 
 
 ## 🚀 Instalación y Configuración
 
-Clonar los repositorios:
+# Clonar los repositorios:
 
-git clone https://github.com/sergioLahuerta/Backend-MediScan.git
+git clone https://github.com/sergioLahuerta/Backend-MediScan.git  
 git clone https://github.com/sergioLahuerta/Frontend-MediScan.git  
 
-Tras clonar los dos repositorios, en la raíz del repositorio del Backend-MediScan sacar el docker-compose.yaml para alojarlo al mismo nivel que sendos repositorios.
-De esta forma:
- ______________________
-| > Backend-Mediscan/  |
-| > Frontend-Mediscan/ | 
-| docker-compose.yaml  |
-|______________________| 
+# Tras clonar los dos repositorios, en la raíz del repositorio del Backend-MediScan sacar el docker-compose.yaml para alojarlo al mismo nivel que sendos repositorios.  
+De esta forma:  
+ ______________________  
+| > Backend-Mediscan/  |  
+| > Frontend-Mediscan/ |  
+| docker-compose.yaml  |  
+|______________________|  
 
-Con esa disposición, en una terminal en la ruta del docker-compose.yaml y los repositorios ->  
-## docker-compose up --build -d
+# Con esa disposición, en una terminal en la ruta del docker-compose.yaml y los repositorios ->  
+docker-compose up --build -d  
 
 
-Tras el mensaje de que están Started los tres contenedores, estará disponible:  
-## Web: http://localhost:8080  
-## Api Swagger: http://localhost:5073/swagger  
+# Tras el mensaje de que están Started los tres contenedores, estará disponible:  
+Web: http://localhost:8080  
+Api Swagger: http://localhost:5073/swagger  
 
 
 
@@ -84,11 +84,9 @@ Accede a Swagger UI en: `http://localhost:5073/swagger`
 
 ## 🤝 Contribuir
 
-Estamos abiertos a posibles mejoras y avances de la aplicación.
+Estamos abiertos a posibles mejoras y avances de la aplicación por parte de la comunidad.  
+Gracias.
 
-## 📄 Licencia
-
-Este proyecto está bajo la Licencia MIT. Ver el archivo [LICENSE](LICENSE) para más detalles.
 
 ## 📞 Contacto
 
