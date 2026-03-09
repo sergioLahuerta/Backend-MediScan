@@ -44,6 +44,9 @@ De esta forma:
 | docker-compose.yaml  |  
 |______________________|  
 
+<img width="170" height="75" alt="image" src="https://github.com/user-attachments/assets/d144b40d-7989-4061-a061-4b9b0a60b991" />
+
+
 # Con esa disposición, en una terminal en la ruta del docker-compose.yaml y los repositorios ->  
 docker-compose up --build -d  
 
