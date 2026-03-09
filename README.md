@@ -1,9 +1,5 @@
 # MediScan Backend
 
-[![.NET](https://img.shields.io/badge/.NET-8.0-blue.svg)](https://dotnet.microsoft.com/)
-[![C#](https://img.shields.io/badge/C%23-12.0-purple.svg)](https://docs.microsoft.com/en-us/dotnet/csharp/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-
 ## 📋 Descripción
 
 MediScan Backend es la API RESTful desarrollada en .NET 8 con C# que soporta la aplicación MediScan, un sistema de gestión médica integral. Implementa arquitectura limpia (Clean Architecture) con capas separadas para una mejor mantenibilidad y escalabilidad.
@@ -35,20 +31,24 @@ MediScan Backend es la API RESTful desarrollada en .NET 8 con C# que soporta la 
 
 ## 🚀 Instalación y Configuración
 
+Clonar los repositorios:
+
+git clone https://github.com/sergioLahuerta/Backend-MediScan.git  
+git clone https://github.com/sergioLahuerta/Frontend-MediScan.git  
+
+Tras clonar los dos repositorios, en la raíz del repositorio del Backend-MediScan sacar el docker-compose.yaml para alojarlo al mismo nivel que sendos repositorios.  
+
+Con esa disposición, en una terminal en la ruta del docker-compose.yaml hacer:
+docker-compose build  
+Y después:   
+docker-compose up -d  
 
 
-### Desarrollo
-```bash
-dotnet run --project MediScan.Api
-```
+Tras el mensaje de que están Started los tres contenedores, estará disponible:  
+Web: http://localhost:8080  
+Api Swagger: http://localhost:5073/swagger  
 
-### Build y Publish
-```bash
-dotnet build MediScan.sln
-dotnet publish MediScan.Api -c Release -o ./publish
-```
 
-La API estará disponible en `https://localhost:5001` (HTTPS) y `http://localhost:5000` (HTTP).
 
 ## 📚 Documentación API
 
