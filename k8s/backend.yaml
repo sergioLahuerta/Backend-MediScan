@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+data:
+  ConnectionStrings__DefaultConnection: "Server=mysql;Database=MediScanDB;Uid=root;Pwd=yourStrongPassword;Port=3306;AllowUserVariables=true"
+  ASPNETCORE_ENVIRONMENT: "Development"
+  JWT__Key: "super_secret_key_mediscan_min_32_characters_1234!"
+  JWT__Issuer: "MediScanApi"
+  Groq__ApiKey: "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"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      initContainers:
+      - name: init-permissions
+        image: busybox
+        command: ["sh", "-c", "mkdir -p /app/wwwroot/uploads/profiles && chmod -R 777 /app/wwwroot/uploads"]
+        volumeMounts:
+        - name: backend-uploads
+          mountPath: /app/wwwroot/uploads
+      containers:
+      - name: backend
+        image: sergiolala/mediscan-backend:latest
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: backend-uploads
+          mountPath: /app/wwwroot/uploads
+        envFrom:
+        - configMapRef:
+            name: backend-config
+      volumes:
+      - name: backend-uploads
+        hostPath:
+          path: /mnt/data/mediscan-uploads
+          type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 8080
+  selector:
+    app: backend

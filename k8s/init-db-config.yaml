@@ -1,0 +1,209 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-init-config
+data:
+  schema.sql: |
+    -- Proyecto MediScan DB Schema (MySQL)
+    CREATE DATABASE IF NOT EXISTS MediScanDB;
+    USE MediScanDB;
+    CREATE TABLE IF NOT EXISTS Roles (
+        Id INT AUTO_INCREMENT PRIMARY KEY,
+        Name VARCHAR(50) NOT NULL UNIQUE,
+        Description VARCHAR(255)
+    );
+    CREATE TABLE IF NOT EXISTS Users (
+        Id CHAR(36) PRIMARY KEY,
+        Email VARCHAR(255) UNIQUE NOT NULL,
+        PasswordHash VARCHAR(255),
+        RoleId INT,
+        CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+        UpdatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        IsActive BOOLEAN DEFAULT TRUE,
+        ProfileImageUrl VARCHAR(500) NULL,
+        FOREIGN KEY (RoleId) REFERENCES Roles(Id)
+    );
+    CREATE TABLE IF NOT EXISTS UsageCounters (
+        Id INT AUTO_INCREMENT PRIMARY KEY,
+        UserId CHAR(36),
+        ClientIdentifier VARCHAR(255),
+        TokensUsed INT DEFAULT 0,
+        MessagesSent INT DEFAULT 0,
+        PeriodStart DATETIME,
+        PeriodEnd DATETIME,
+        FOREIGN KEY (UserId) REFERENCES Users(Id)
+    );
+    CREATE TABLE IF NOT EXISTS Patients (
+        UserId CHAR(36) PRIMARY KEY,
+        FirstName VARCHAR(100) NOT NULL,
+        LastName VARCHAR(100) NOT NULL,
+        DateOfBirth DATE,
+        Gender VARCHAR(20),
+        Phone VARCHAR(20),
+        FOREIGN KEY (UserId) REFERENCES Users(Id)
+    );
+    CREATE TABLE IF NOT EXISTS Professionals (
+        UserId CHAR(36) PRIMARY KEY,
+        FirstName VARCHAR(100) NOT NULL,
+        LastName VARCHAR(100) NOT NULL,
+        LicenseNumber VARCHAR(100) UNIQUE NOT NULL,
+        Specialty VARCHAR(100) NOT NULL,
+        Phone VARCHAR(20),
+        Bio TEXT,
+        FOREIGN KEY (UserId) REFERENCES Users(Id)
+    );
+    CREATE TABLE IF NOT EXISTS Organizations (
+        Id CHAR(36) PRIMARY KEY,
+        Name VARCHAR(200) NOT NULL,
+        Address VARCHAR(255),
+        ContactPhone VARCHAR(20),
+        ContactEmail VARCHAR(255)
+    );
+    CREATE TABLE IF NOT EXISTS DoctorPatient (
+        PatientId CHAR(36),
+        ProfessionalId CHAR(36),
+        CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (PatientId, ProfessionalId),
+        FOREIGN KEY (PatientId) REFERENCES Patients(UserId),
+        FOREIGN KEY (ProfessionalId) REFERENCES Professionals(UserId)
+    );
+    CREATE TABLE IF NOT EXISTS Professional_Org (
+        ProfessionalId CHAR(36),
+        OrganizationId CHAR(36),
+        JoinedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (ProfessionalId, OrganizationId),
+        FOREIGN KEY (ProfessionalId) REFERENCES Professionals(UserId),
+        FOREIGN KEY (OrganizationId) REFERENCES Organizations(Id)
+    );
+    CREATE TABLE IF NOT EXISTS Professional_Schedules (
+        Id INT AUTO_INCREMENT PRIMARY KEY,
+        ProfessionalId CHAR(36) NOT NULL,
+        DayOfWeek INT NOT NULL,
+        StartTime TIME NOT NULL,
+        EndTime TIME NOT NULL,
+        IsAvailable BOOLEAN DEFAULT TRUE,
+        FOREIGN KEY (ProfessionalId) REFERENCES Professionals(UserId)
+    );
+    CREATE TABLE IF NOT EXISTS Appointments (
+        Id INT AUTO_INCREMENT PRIMARY KEY,
+        PatientId CHAR(36) NOT NULL,
+        ProfessionalId CHAR(36) NOT NULL,
+        AppointmentDate DATETIME NOT NULL,
+        DurationMinutes INT DEFAULT 30,
+        Status VARCHAR(50) DEFAULT 'Scheduled',
+        Notes TEXT,
+        FOREIGN KEY (PatientId) REFERENCES Patients(UserId),
+        FOREIGN KEY (ProfessionalId) REFERENCES Professionals(UserId)
+    );
+    CREATE TABLE IF NOT EXISTS ChatSessions (
+        Id CHAR(36) PRIMARY KEY,
+        UserId CHAR(36),
+        SessionType VARCHAR(50) DEFAULT 'Diagnosis',
+        StartedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+        EndedAt DATETIME,
+        Title VARCHAR(255),
+        FOREIGN KEY (UserId) REFERENCES Users(Id)
+    );
+    CREATE TABLE IF NOT EXISTS ChatMessages (
+        Id BIGINT AUTO_INCREMENT PRIMARY KEY,
+        ChatSessionId CHAR(36) NOT NULL,
+        SenderType VARCHAR(50) NOT NULL,
+        MessageText TEXT NOT NULL,
+        SentAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (ChatSessionId) REFERENCES ChatSessions(Id)
+    );
+    CREATE TABLE IF NOT EXISTS MessageAttachments (
+        Id BIGINT AUTO_INCREMENT PRIMARY KEY,
+        ChatMessageId BIGINT NOT NULL,
+        FileUrl VARCHAR(500) NOT NULL,
+        FileType VARCHAR(50) NOT NULL,
+        UploadedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (ChatMessageId) REFERENCES ChatMessages(Id)
+    );
+    CREATE TABLE IF NOT EXISTS Diagnosis (
+        Id INT AUTO_INCREMENT PRIMARY KEY,
+        PatientId CHAR(36) NOT NULL,
+        ProfessionalId CHAR(36) NOT NULL,
+        DiagnosisDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+        Description TEXT NOT NULL,
+        ICD10Code VARCHAR(20),
+        FOREIGN KEY (PatientId) REFERENCES Patients(UserId),
+        FOREIGN KEY (ProfessionalId) REFERENCES Professionals(UserId)
+    );
+    CREATE TABLE IF NOT EXISTS Treatments (
+        Id INT AUTO_INCREMENT PRIMARY KEY,
+        DiagnosisId INT NOT NULL,
+        Description TEXT NOT NULL,
+        StartDate DATE,
+        EndDate DATE,
+        FOREIGN KEY (DiagnosisId) REFERENCES Diagnosis(Id)
+    );
+    CREATE TABLE IF NOT EXISTS Reviews (
+        Id INT AUTO_INCREMENT PRIMARY KEY,
+        PatientId CHAR(36) NOT NULL,
+        ProfessionalId CHAR(36) NOT NULL,
+        Rating INT CHECK (Rating >= 1 AND Rating <= 5),
+        Comment TEXT,
+        CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (PatientId) REFERENCES Patients(UserId),
+        FOREIGN KEY (ProfessionalId) REFERENCES Professionals(UserId)
+    );
+    CREATE TABLE IF NOT EXISTS Plans (
+        Id INT AUTO_INCREMENT PRIMARY KEY,
+        Name VARCHAR(100) NOT NULL, 
+        Price DECIMAL(10, 2) NOT NULL,
+        MaxMessages INT,
+        Features TEXT
+    );
+    CREATE TABLE IF NOT EXISTS Subscriptions (
+        Id INT AUTO_INCREMENT PRIMARY KEY,
+        UserId CHAR(36) NOT NULL,
+        PlanId INT NOT NULL,
+        StartDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+        EndDate DATETIME,
+        Status VARCHAR(50) DEFAULT 'Active',
+        FOREIGN KEY (UserId) REFERENCES Users(Id),
+        FOREIGN KEY (PlanId) REFERENCES Plans(Id)
+    );
+    CREATE TABLE IF NOT EXISTS Payments (
+        Id INT AUTO_INCREMENT PRIMARY KEY,
+        SubscriptionId INT NOT NULL,
+        Amount DECIMAL(10, 2) NOT NULL,
+        PaymentDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+        PaymentMethod VARCHAR(50),
+        Status VARCHAR(50) DEFAULT 'Completed',
+        FOREIGN KEY (SubscriptionId) REFERENCES Subscriptions(Id)
+    );
+    CREATE TABLE IF NOT EXISTS Invoices (
+        Id INT AUTO_INCREMENT PRIMARY KEY,
+        PaymentId INT NOT NULL,
+        InvoiceNumber VARCHAR(100) UNIQUE NOT NULL,
+        InvoiceDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+        TotalAmount DECIMAL(10, 2) NOT NULL,
+        FOREIGN KEY (PaymentId) REFERENCES Payments(Id)
+    );
+    CREATE TABLE IF NOT EXISTS DetailInvoices (
+        Id INT AUTO_INCREMENT PRIMARY KEY,
+        InvoiceId INT NOT NULL,
+        Description VARCHAR(255) NOT NULL,
+        Quantity INT DEFAULT 1,
+        UnitPrice DECIMAL(10, 2) NOT NULL,
+        Subtotal DECIMAL(10, 2) NOT NULL,
+        FOREIGN KEY (InvoiceId) REFERENCES Invoices(Id)
+    );
+
+  seed.sql: |
+    USE MediScanDB;
+    INSERT IGNORE INTO Roles (Name, Description) VALUES ('Admin', 'Admin'), ('Patient', 'Patient'), ('Professional', 'Professional');
+    SET @AdminId = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb';
+    SET @PatientId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+    SET @DoctorId = 'cccccccc-cccc-cccc-cccc-cccccccccccc';
+    REPLACE INTO Users (Id, Email, PasswordHash, RoleId) VALUES
+    (@AdminId, 'admin@mediscan.com', '$2a$11$AhTkc4dAL2hmOwjYyNmyyOgJ6TfQQc88smg/rtVzrxzI9t0Ne7Eci', (SELECT Id FROM Roles WHERE Name = 'Admin')),
+    (@PatientId, 'juan.paciente@email.com', '$2a$11$5j1iDa897IReTfRZUaqlQenmQK4OnJIKk3QH7kUdK4vp26oqSnD0e', (SELECT Id FROM Roles WHERE Name = 'Patient')),
+    (@DoctorId, 'dra.martinez@mediscan.com', '$2a$11$Jl5zPYII51/QGhefhr1sDOR3R1V6IFakp8PRQSQj0rs0vL/eSrFgy', (SELECT Id FROM Roles WHERE Name = 'Professional'));
+    INSERT INTO Patients (UserId, FirstName, LastName, DateOfBirth, Gender, Phone) VALUES
+    (@PatientId, 'Juan', 'Pérez', '1985-05-15', 'Masculino', '+34600123456');
+    INSERT INTO Professionals (UserId, FirstName, LastName, LicenseNumber, Specialty, Phone, Bio) VALUES
+    (@DoctorId, 'Laura', 'Martínez', 'MED-12345-MAD', 'Dermatología', '+34611987654', 'Dermatóloga.');
+    INSERT INTO Plans (Name, Price, MaxMessages) VALUES ('Free', 0.00, 20), ('Premium', 9.99, NULL);
