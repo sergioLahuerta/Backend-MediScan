@@ -33,8 +33,8 @@ MediScan Backend es la API RESTful desarrollada en .NET 8 con C# que soporta la 
 
 1. Clonar los repositorios:
 
-git clone https://github.com/sergioLahuerta/Backend-MediScan.git  
-git clone https://github.com/sergioLahuerta/Frontend-MediScan.git  
+### git clone https://github.com/sergioLahuerta/Backend-MediScan.git  
+### git clone https://github.com/sergioLahuerta/Frontend-MediScan.git  
 
 2. En la raíz del repositorio del Backend-MediScan sacar el docker-compose.yaml para alojarlo al mismo nivel que sendos repositorios.  
 
@@ -44,7 +44,7 @@ git clone https://github.com/sergioLahuerta/Frontend-MediScan.git
 
 
 3. Con esa disposición, en una terminal en la ruta del docker-compose.yaml y los repositorios ->  
-# docker-compose up --build -d  
+### docker-compose up --build -d  
 
 
 4. Tras el mensaje de que están Started los tres contenedores, estará disponible:  
