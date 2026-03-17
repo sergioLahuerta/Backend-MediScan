@@ -49,7 +49,7 @@ MediScan Backend es la API RESTful desarrollada en .NET 8 con C# que soporta la 
 
 4. Tras el mensaje de que están Started los tres contenedores, estará disponible:  
 
-### Web: http://localhost:8080  
+### Web: http://localhost  
 ### Api Swagger: http://localhost:5073/swagger  
 
 
